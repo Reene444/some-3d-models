@@ -1,0 +1,4 @@
+**/*.glb filter=lfs diff=lfs merge=lfs -text
+node_modules/** export-ignore
+*.glb filter=lfs diff=lfs merge=lfs -text
+architecture/furniture.glb filter=lfs diff=lfs merge=lfs -text

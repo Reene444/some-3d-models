@@ -1,6 +1,6 @@
 {
   "name": "some-3d-models",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "main": "index.js",
   "bin": {
     "glbgx": "./cli.js"

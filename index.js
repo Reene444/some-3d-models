@@ -5,3 +5,5 @@ export const Raichu= require('./assets/models/raichu.glb');
 export const Ball= require('./assets/models/ball.glb');
 export const HeilBall= require('./assets/models/heli-ball.glb');
 export const Loading= require('./assets/models/loading.glb');
+export const GithubText= require('./assets/models/GithubText.glb');
+export const Shiba= require('./assets/models/shiba.glb');

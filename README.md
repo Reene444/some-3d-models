@@ -1,6 +1,5 @@
 ### [some-3d-models](https://www.npmjs.com/package/some-3d-models) ![npm](https://img.shields.io/npm/v/some-3d-models)
 
-
 `some-3d-models` is a CLI tool for generating React components to load and display `.glb` models with or without animations.
 Installation
 
@@ -20,11 +19,16 @@ npx some-3d-models glbgx <glbPath> [options]
 - `--name <name>` or `-n <name>`: The name of the generated React component (default: `GLBModel`).
   Example:
 - `--animation <animation>` or `-a <animation>`: The name of the animation to be played. If this option is not provided, the generated component will not include any animations. If an animation name is provided, the component will play the specified animation when loaded.
+-
+
+* `--text` or `-t`: Generate a glowing text component.
+* `--color <color>` or `-c <color>`: The color of the glowing text in hexadecimal format (default: `#ff9900`).
+* `--url <url>` or `-u <url>`: The URL to open when the glowing text is clicked (default: `https://github.com/Reene444`).
 
 ```bash
 npx some-3d-models glbgx models/hero.glb -n HeroModel
 npx some-3d-models glbgx models/hero.glb -n HeroModel -a "Walk"
-
+npx some-3d-models glbgx models/hero.glb -n HeroModel -t -c "#ff9900" -u "https://example.com"
 ```
 
 #### Generated Component Example
@@ -96,6 +100,84 @@ const HeroModel = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, anim
 useGLTF.preload(process.env.PUBLIC_URL + "/models/hero.glb");
 
 export default HeroModel;
+
+
+
+```
+
+Glowing Text Model:
+
+```
+import React, { useRef, useEffect } from 'react';
+import { useGLTF } from '@react-three/drei';
+import { RigidBody } from '@react-three/rapier';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+
+const GlowingTextModel = ({ modelPath, position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, color = '#ff9900', onClickUrl = 'https://github.com/Reene444' }) => {
+  const { scene } = useGLTF(modelPath);
+  const rigidBodyRef = useRef();
+  const modelRef = useRef();
+  const emissiveMaterialRef = useRef();
+
+  useEffect(() => {
+    modelRef.current.traverse((child) => {
+      if (child.isMesh) {
+        // Create a glowing material
+        const emissiveMaterial = new THREE.MeshStandardMaterial({
+          color: 0xffffff, // Base color
+          emissive: new THREE.Color(color), // Glow color
+          emissiveIntensity: 1, // Glow intensity
+          transparent: true,
+          opacity: 1,
+        });
+
+        child.material = emissiveMaterial;
+        emissiveMaterialRef.current = emissiveMaterial;
+      }
+    });
+  }, [color]);
+
+  // Pulsing effect
+  useFrame((state) => {
+    if (emissiveMaterialRef.current) {
+      const time = state.clock.getElapsedTime();
+      emissiveMaterialRef.current.emissiveIntensity = 1.5 + Math.sin(time * 2) * 0.5;
+    }
+  });
+
+  const handleClick = () => {
+    if (onClickUrl) {
+      window.open(onClickUrl, '_blank');
+    }
+  };
+
+  const handleCollisionEnter = (e) => {
+    if (rigidBodyRef.current) {
+      const impulse = [0, 1, 0]; // Apply upward impulse
+      rigidBodyRef.current.applyImpulse(impulse, true);
+    }
+  };
+
+  return (
+    <RigidBody type="fixed" colliders="trimesh" ref={rigidBodyRef} onCollisionEnter={handleCollisionEnter}>
+      <primitive
+        ref={modelRef}
+        object={scene}
+        position={position}
+        rotation={rotation}
+        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+        onClick={handleClick}
+        castShadow
+        receiveShadow
+      />
+    </RigidBody>
+  );
+};
+
+useGLTF.preload(modelPath);
+
+export default GlowingTextModel;
 
 ```
 

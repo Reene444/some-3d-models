@@ -1,11 +1,12 @@
 {
   "name": "some-3d-models",
-  "version": "1.0.18",
+  "version": "1.0.20",
   "main": "index.js",
   "bin": {
     "glbgx": "./cli.js"
   },
   "scripts": {
+    "start": "node ./cli.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

@@ -5,33 +5,33 @@ const path = require('path');
 const ejs = require('ejs');
 const { program } = require('commander');
 
-// with animation
+// Template for a GLB model with animation
 const animatedTemplate = `
 import React, { useEffect, useRef } from "react";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 
 const <%= componentName %> = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, animationName = "<%= animationName %>" }) => {
-  // 加载 GLB 文件
+  // Load the GLB model
   const { scene, animations } = useGLTF(process.env.PUBLIC_URL + "<%= glbPath %>");
 
-  // 创建 AnimationMixer 用于控制动画
+  // Create an AnimationMixer to control animations
   const mixer = useRef(null);
 
-  // 获取并控制加载的动画
+  // Get and control the loaded animations
   const { actions } = useAnimations(animations, scene);
 
-  // 如果模型有动画并且动画名称存在，播放指定的动画
+  // Play the specified animation if it exists
   useEffect(() => {
     if (actions && animationName && actions[animationName]) {
-      actions[animationName].play(); // 播放指定动画
+      actions[animationName].play(); // Play the specified animation
     }
   }, [actions, animationName]);
 
-  // 在每帧更新动画，不需要手动调用 update
+  // Update animation on each frame without needing to manually call update
   useFrame(() => {
     if (mixer.current) {
-      mixer.current.update(); // 这里不再需要调用 .update(delta)
+      mixer.current.update(); // No need to call .update(delta) here
     }
   });
 
@@ -52,13 +52,13 @@ useGLTF.preload(process.env.PUBLIC_URL + "<%= glbPath %>");
 export default <%= componentName %>;
 `;
 
-// 没有动画的模板
+// Template for a GLB model without animation
 const staticTemplate = `
 import React from "react";
 import { useGLTF } from "@react-three/drei";
 
 const <%= componentName %> = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1 }) => {
-  // 加载 GLB 文件
+  // Load the GLB model
   const { scene } = useGLTF(process.env.PUBLIC_URL + "<%= glbPath %>");
 
   return (
@@ -78,32 +78,123 @@ useGLTF.preload(process.env.PUBLIC_URL + "<%= glbPath %>");
 export default <%= componentName %>;
 `;
 
+// Template for a glowing text model
+const glowingTextTemplate = `
+import React, { useRef, useEffect } from 'react';
+import { useGLTF } from '@react-three/drei';
+import { RigidBody } from '@react-three/rapier';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+
+const <%= componentName %> = ({ modelPath, position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, color = '<%= defaultColor %>', onClickUrl = '<%= defaultUrl %>' }) => {
+  const { scene } = useGLTF(modelPath);
+  const rigidBodyRef = useRef();
+  const modelRef = useRef();
+  const emissiveMaterialRef = useRef();
+
+  useEffect(() => {
+    modelRef.current.traverse((child) => {
+      if (child.isMesh) {
+        // Create a glowing material
+        const emissiveMaterial = new THREE.MeshStandardMaterial({
+          color: 0xffffff, // Base color
+          emissive: new THREE.Color(color), // Emissive color
+          emissiveIntensity: 1, // Emissive intensity
+          transparent: true,
+          opacity: 1,
+        });
+
+        child.material = emissiveMaterial;
+        emissiveMaterialRef.current = emissiveMaterial;
+      }
+    });
+  }, [color]);
+
+  // Pulsing effect
+  useFrame((state) => {
+    if (emissiveMaterialRef.current) {
+      const time = state.clock.getElapsedTime();
+      emissiveMaterialRef.current.emissiveIntensity = 1.5 + Math.sin(time * 2) * 0.5;
+    }
+  });
+
+  const handleClick = () => {
+    if (onClickUrl) {
+      window.open(onClickUrl, '_blank');
+    }
+  };
+
+  const handleCollisionEnter = (e) => {
+    if (rigidBodyRef.current) {
+      const impulse = [0, 1, 0]; // Upward impulse
+      rigidBodyRef.current.applyImpulse(impulse, true);
+    }
+  };
+
+  return (
+    <RigidBody type="fixed" colliders="trimesh" ref={rigidBodyRef} onCollisionEnter={handleCollisionEnter}>
+      <primitive
+        ref={modelRef}
+        object={scene}
+        position={position}
+        rotation={rotation}
+        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+        onClick={handleClick}
+        castShadow
+        receiveShadow
+      />
+    </RigidBody>
+  );
+};
+
+useGLTF.preload(modelPath);
+
+export default <%= componentName %>;
+`;
+
 program
   .command('glbgx <glbPath>')
+  .alias('some-3d-models')
   .description('Generate a React component for a GLB model with or without animation')
   .option('-n, --name <name>', 'Component name', 'GLBModel')
-  .option('-a, --animation <animation>', 'Animation name') // 动画名称作为可选项
+  .option('-a, --animation <animation>', 'Animation name') // Optional animation name
+  .option('-t, --text', 'Generate a glowing text component')  // New option to generate glowing text component
+  .option('-c, --color <color>', 'Glow color (in hexadecimal)', '0xffa500')  // Default color
+  .option('-u, --url <url>', 'URL to open on click', 'https://github.com/Reene444')  // Default URL
   .action(async (glbPath, options) => {
-    const { name, animation } = options;
+    const { name, animation, text, color, url } = options;
     const componentName = name.charAt(0).toUpperCase() + name.slice(1);
 
-    // 根据是否提供了 --animation 来决定模板
-    const template = animation ? animatedTemplate : staticTemplate;
+    let rendered;
 
-    // 渲染模板
-    const rendered = ejs.render(template, {
-      componentName: componentName,
-      glbPath: glbPath,
-      animationName: animation || "Take 01" // 默认动画名称为 "Take 01"（如果没有指定）
-    });
+    // If --text option is used, generate glowing text component
+    if (text) {
+      if (!color || !url) {
+        console.error('Both --color and --url are required when using the --text option.');
+        process.exit(1);
+      }
 
-    // 确保组件目录存在
+      rendered = ejs.render(glowingTextTemplate, {
+        componentName: componentName,
+        modelPath: glbPath,
+        defaultColor: color,
+        defaultUrl: url,
+      });
+    } else {
+      // Generate GLB model component
+      const template = animation ? animatedTemplate : staticTemplate;
+      rendered = ejs.render(template, {
+        componentName: componentName,
+        glbPath: glbPath,
+        animationName: animation || "Take 01",
+      });
+    }
+
     const componentDir = path.join(process.cwd(), 'src/components');
     if (!fs.existsSync(componentDir)) {
       fs.mkdirSync(componentDir, { recursive: true });
     }
 
-    // 写入文件
     const componentPath = path.join(componentDir, `${componentName}.js`);
     fs.writeFileSync(componentPath, rendered);
 

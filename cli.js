@@ -86,8 +86,8 @@ import { RigidBody } from '@react-three/rapier';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const <%= componentName %> = ({ modelPath, position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, color = '<%= defaultColor %>', onClickUrl = '<%= defaultUrl %>' }) => {
-  const { scene } = useGLTF(modelPath);
+const <%= componentName %> = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, color = '<%= defaultColor %>', onClickUrl = '<%= defaultUrl %>' }) => {
+  const { scene } = useGLTF(process.env.PUBLIC_URL + "<%= glbPath %>");
   const rigidBodyRef = useRef();
   const modelRef = useRef();
   const emissiveMaterialRef = useRef();

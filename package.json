@@ -1,6 +1,6 @@
 {
   "name": "some-3d-models",
-  "version": "1.0.23",
+  "version": "1.0.28",
   "main": "index.js",
   "bin": {
     "glbgx": "./cli.js"
@@ -22,6 +22,6 @@
   "type": "git",
   "url": "git+https://github.com/Reene444/some-3d-models"
 } ,
-  "author": "Reene444",
-  "license": "ISC"
+  "author": "reene444",
+  "license": "MIT"
 }

@@ -85,7 +85,8 @@ import { useGLTF } from '@react-three/drei';
 import { RigidBody } from '@react-three/rapier';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-
+import { KernelSize } from 'postprocessing'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
 const <%= componentName %> = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, color = '<%= defaultColor %>', onClickUrl = '<%= defaultUrl %>' }) => {
   const { scene } = useGLTF(process.env.PUBLIC_URL + "<%= glbPath %>");
   const rigidBodyRef = useRef();
@@ -101,7 +102,7 @@ const <%= componentName %> = ({ position = [0, 0, 0], rotation = [0, 0, 0], scal
           emissive: new THREE.Color(color), // Emissive color
           emissiveIntensity: 1, // Emissive intensity
           transparent: true,
-          opacity: 1,
+          opacity: 0.4,
         });
 
         child.material = emissiveMaterial;
@@ -120,7 +121,7 @@ const <%= componentName %> = ({ position = [0, 0, 0], rotation = [0, 0, 0], scal
 
   const handleClick = () => {
     if (onClickUrl) {
-      window.open(onClickUrl, '_blank');
+      window.open(onClickUrl, '_blank', 'noopener,noreferrer,width=800,height=600,top=100,left=100');
     }
   };
 
@@ -128,10 +129,14 @@ const <%= componentName %> = ({ position = [0, 0, 0], rotation = [0, 0, 0], scal
     if (rigidBodyRef.current) {
       const impulse = [0, 1, 0]; // Upward impulse
       rigidBodyRef.current.applyImpulse(impulse, true);
+      if (onClickUrl) {
+      window.open(onClickUrl, '_blank', 'noopener,noreferrer,width=800,height=600,top=100,left=100');
+    }
     }
   };
 
   return (
+      <>
     <RigidBody type="fixed" colliders="trimesh" ref={rigidBodyRef} onCollisionEnter={handleCollisionEnter}>
       <primitive
         ref={modelRef}
@@ -144,10 +149,15 @@ const <%= componentName %> = ({ position = [0, 0, 0], rotation = [0, 0, 0], scal
         receiveShadow
       />
     </RigidBody>
+        {/*  <EffectComposer multisampling={1}>
+        <Bloom kernelSize={3} luminanceThreshold={0} luminanceSmoothing={0.4} intensity={0.6} />
+        <Bloom kernelSize={KernelSize.HUGE} luminanceThreshold={0} luminanceSmoothing={0} intensity={0.5} />
+      </EffectComposer>*/}
+    </>
   );
 };
 
-useGLTF.preload(modelPath);
+useGLTF.preload(process.env.PUBLIC_URL + "<%= glbPath %>");
 
 export default <%= componentName %>;
 `;
@@ -176,7 +186,7 @@ program
 
       rendered = ejs.render(glowingTextTemplate, {
         componentName: componentName,
-        modelPath: glbPath,
+        glbPath: glbPath,
         defaultColor: color,
         defaultUrl: url,
       });

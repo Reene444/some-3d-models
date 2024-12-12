@@ -7,3 +7,5 @@ export const HeilBall= require('./assets/models/heli-ball.glb');
 export const Loading= require('./assets/models/loading.glb');
 export const GithubText= require('./assets/models/githubText.glb');
 export const Shiba= require('./assets/models/shiba.glb');
+export const LinkedinText= require('./assets/models/linkedinText.glb');
+export const TwitterText= require('./assets/models/twitterText.glb');

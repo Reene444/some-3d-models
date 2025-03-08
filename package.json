@@ -1,6 +1,6 @@
 {
   "name": "some-3d-models",
-  "version": "1.0.29",
+  "version": "1.0.30",
   "main": "index.js",
   "bin": {
     "glbgx": "./cli.js"
@@ -9,19 +9,25 @@
     "start": "node ./cli.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-"keywords": ["3D", "React","cli", ".glb model loading", "webgl", "three.js"],
-"description": "A tool for generating React components to display 3D models and provide some build-in 3d .glb models",
+  "keywords": [
+    "3D",
+    "React",
+    "cli",
+    ".glb model loading",
+    "webgl",
+    "three.js"
+  ],
+  "description": "A tool for generating React components to display 3D models and provide some build-in 3d .glb models",
   "dependencies": {
     "commander": "^8.3.0",
     "ejs": "^3.1.10",
     "fs-extra": "^10.1.0"
-  }
-  ,
+  },
   "homepage": "https://reene444.github.io/io",
   "repository": {
-  "type": "git",
-  "url": "git+https://github.com/Reene444/some-3d-models"
-} ,
+    "type": "git",
+    "url": "git+https://github.com/Reene444/some-3d-models"
+  },
   "author": "reene444",
   "license": "MIT"
 }

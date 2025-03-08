@@ -1,4 +1,6 @@
-### [some-3d-models](https://www.npmjs.com/package/some-3d-models) ![npm](https://img.shields.io/npm/v/some-3d-models)
+### [some-3d-models](https://www.npmjs.com/package/some-3d-models) ![npm](https://img.shields.io/npm/v/some-3d-models) 
+
+![MIT License](https://img.shields.io/badge/license-MIT-green)
 
 `some-3d-models` is a CLI tool for generating React components to load and display `.glb` models with or without animations.
 Installation

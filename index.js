@@ -9,3 +9,5 @@ export const GithubText= require('./assets/models/githubText.glb');
 export const Shiba= require('./assets/models/shiba.glb');
 export const LinkedinText= require('./assets/models/linkedinText.glb');
 export const TwitterText= require('./assets/models/twitterText.glb');
+export const CuteRobot= require('./assets/models/cute_robot.glb');
+export const Brooklyn_bridge_at_night= require('./assets/models/brooklyn_bridge_at_night.glb');

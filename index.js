@@ -11,3 +11,4 @@ export const LinkedinText= require('./assets/models/linkedinText.glb');
 export const TwitterText= require('./assets/models/twitterText.glb');
 export const CuteRobot= require('./assets/models/cute_robot.glb');
 export const Brooklyn_bridge_at_night= require('./assets/models/brooklyn_bridge_at_night.glb');
+export const Spacetravel= require('./assets/models/wormhole_space.glb');
